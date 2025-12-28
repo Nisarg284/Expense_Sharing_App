@@ -20,6 +20,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String,String>> login(@RequestBody Map<String,String> request){
