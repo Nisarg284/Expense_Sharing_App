@@ -1,7 +1,10 @@
 package com.n23.expense_sharing_app.controller;
 
 
+import com.n23.expense_sharing_app.dto.LoginRequestDTO;
+import com.n23.expense_sharing_app.entity.User;
 import com.n23.expense_sharing_app.security.JwtUtils;
+import com.n23.expense_sharing_app.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,5 +39,11 @@ public class AuthController {
         String token = jwtUtils.generateToken(email);
 
         return ResponseEntity.ok(Map.of("token",token));
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<User> register(@RequestBody User user)
+    {
+        return ResponseEntity.ok(userService.register(user));
     }
 }
