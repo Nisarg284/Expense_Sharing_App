@@ -23,9 +23,9 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String,String>> login(@RequestBody Map<String,String> request){
-        String email = request.get("email");
-        String password = request.get("password");
+    public ResponseEntity<Map<String,String>>login(@RequestBody LoginRequestDTO request){
+        String email = request.getEmail();
+        String password = request.getPassword();
 
         // 1. Authenticate (This Will Throw exception if bad Credentials)
         authenticationManager.authenticate(
