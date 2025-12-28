@@ -118,11 +118,13 @@ public class SettlementService {
             if(Math.abs(payerRemaining) > 0.01)
             {
                 payer.setValue(payerRemaining);
+                negative.add(payer);
             }
 
             if(Math.abs(receiverRemaining) > 0.01)
             {
                 receiver.setValue(receiverRemaining);
+                positive.add(receiver);
             }
         }
             return transections;

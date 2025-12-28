@@ -6,10 +6,9 @@ import com.n23.expense_sharing_app.entity.Expense;
 import com.n23.expense_sharing_app.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/expense")
@@ -25,4 +24,15 @@ public class ExpenseController {
 
         return ResponseEntity.ok(expense);
     }
+
+    @GetMapping("/group/{groupId}")
+    public ResponseEntity<List<Expense>>getGroupExpenses(@PathVariable Long groupId)
+    {
+        List<Expense> groupExpenses = expenseService.getGroupExpenses(groupId);
+
+        return ResponseEntity.ok(groupExpenses);
+    }
+
+
+
 }

@@ -43,6 +43,7 @@ public class Expense {
     private Group group;
 
     @OneToMany(mappedBy = "expense", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
     private List<ExpenseSplit> expenseSplits;
 
 

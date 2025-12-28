@@ -48,4 +48,15 @@ public class GroupService {
     }
 
 
+
+    public List<Group> getUserGroups(Long userId)
+    {
+        List<Group> allGroups = groupRepository.findGroupsByGroupMembersId(userId);
+
+        return allGroups;
+    }
+
+
+
+
 }

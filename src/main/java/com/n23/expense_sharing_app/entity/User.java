@@ -30,7 +30,9 @@ public class User {
     // In User.java
     @ManyToMany(mappedBy = "groupMembers")
     @JsonIgnore // <--- Add this!
-    private Set<Group> groups;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
+
+    private Set<Group> groups = new HashSet<>();
 
 
 }

@@ -11,11 +11,11 @@ import com.n23.expense_sharing_app.repository.ExpenseRepository;
 import com.n23.expense_sharing_app.repository.ExpenseSplitRepository;
 import com.n23.expense_sharing_app.repository.GroupRepository;
 import com.n23.expense_sharing_app.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -84,5 +84,11 @@ public class ExpenseService {
 
         return savedExpense;
 
+    }
+
+    public List<Expense> getGroupExpenses(Long groupId)
+    {
+        List<Expense> allExpensesOfGroup = expenseRepository.findByGroupIdWithSplits(groupId);
+        return allExpensesOfGroup;
     }
 }
