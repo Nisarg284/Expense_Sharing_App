@@ -1,6 +1,7 @@
 package com.n23.expense_sharing_app.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Table(name = "expense_group")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -31,6 +33,7 @@ public class Group {
     @ManyToMany
     @ToString.Exclude
     @JoinTable
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
     private Set<User>groupMembers = new HashSet<>();
 
 }

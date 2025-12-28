@@ -6,6 +6,7 @@ import com.n23.expense_sharing_app.entity.Expense;
 import com.n23.expense_sharing_app.entity.ExpenseSplit;
 import com.n23.expense_sharing_app.entity.Group;
 import com.n23.expense_sharing_app.entity.User;
+import com.n23.expense_sharing_app.exception.ResourceNotFoundException;
 import com.n23.expense_sharing_app.repository.ExpenseRepository;
 import com.n23.expense_sharing_app.repository.ExpenseSplitRepository;
 import com.n23.expense_sharing_app.repository.GroupRepository;
@@ -39,11 +40,11 @@ public class ExpenseService {
     {
         // Validate Group exists
         Group group = groupRepository.findById(requestDTO.getGroupId())
-                .orElseThrow(() -> new EntityNotFoundException("Group not found with this id"));
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found with this id"));
 
         // validate Payer exists
         User payer = userRepository.findById(requestDTO.getPayerId())
-                .orElseThrow(() -> new EntityNotFoundException("Payer Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payer Not Found"));
 
         // Validate the Amount by compare the total amount with splits amount
         double splitSum = requestDTO.getSplits().values().stream()
@@ -71,7 +72,7 @@ public class ExpenseService {
 
             // find Udharyo
             User udharyo = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
             ExpenseSplit split = new ExpenseSplit();
             split.setExpense(savedExpense);

@@ -1,6 +1,7 @@
 package com.n23.expense_sharing_app.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class) // <--- ENSURE THIS IS HERE
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -33,9 +35,11 @@ public class Expense {
 
 
     @ManyToOne
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
     private User paidBy;
 
     @ManyToOne
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
     private Group group;
 
     @OneToMany(mappedBy = "expense", fetch = FetchType.LAZY)

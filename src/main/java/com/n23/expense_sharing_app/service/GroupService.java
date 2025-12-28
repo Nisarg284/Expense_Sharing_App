@@ -4,6 +4,7 @@ package com.n23.expense_sharing_app.service;
 import com.n23.expense_sharing_app.dto.GroupRequestDTO;
 import com.n23.expense_sharing_app.entity.Group;
 import com.n23.expense_sharing_app.entity.User;
+import com.n23.expense_sharing_app.exception.ResourceNotFoundException;
 import com.n23.expense_sharing_app.repository.GroupRepository;
 import com.n23.expense_sharing_app.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,7 +34,7 @@ public class GroupService {
         // Validation
         if(groupMembers.size() != requestDTO.getUserIds().size())
         {
-            throw new EntityNotFoundException("Some users are not in Database");
+            throw new ResourceNotFoundException("Some users are not in Database");
         }
 
         // create new group

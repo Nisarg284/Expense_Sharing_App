@@ -4,26 +4,37 @@ package com.n23.expense_sharing_app.service;
 import com.n23.expense_sharing_app.entity.Expense;
 import com.n23.expense_sharing_app.entity.ExpenseSplit;
 import com.n23.expense_sharing_app.entity.User;
+import com.n23.expense_sharing_app.exception.ResourceNotFoundException;
 import com.n23.expense_sharing_app.repository.ExpenseRepository;
 import com.n23.expense_sharing_app.repository.ExpenseSplitRepository;
+import com.n23.expense_sharing_app.repository.GroupRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@AllArgsConstructor
 public class SettlementService {
 
 
-    @Autowired
+//    @Autowired
     private ExpenseRepository expenseRepository;
 
-    @Autowired
+//    @Autowired
     private ExpenseSplitRepository expenseSplitRepository;
+    private final GroupRepository groupRepository; // add this field
 
 
     public Map<Long,Double> getUserBalance(Long groupId)
     {
+
+        if(!groupRepository.existsById(groupId))
+        {
+            throw new ResourceNotFoundException("Group not found with id:"+groupId);
+        }
+
         List<Expense> expenses = expenseRepository.findByGroupIdWithSplits(groupId);
 
         Map<Long,Double> balance = new HashMap<>();

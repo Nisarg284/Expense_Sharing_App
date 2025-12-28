@@ -1,6 +1,8 @@
 package com.n23.expense_sharing_app.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @ToString
 @Table(name = "app_users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
     @Id
@@ -24,7 +27,10 @@ public class User {
     private String email;
     private String password;
 
-//    private Set<Group> groups = new HashSet<>();
+    // In User.java
+    @ManyToMany(mappedBy = "groupMembers")
+    @JsonIgnore // <--- Add this!
+    private Set<Group> groups;
 
 
 }
