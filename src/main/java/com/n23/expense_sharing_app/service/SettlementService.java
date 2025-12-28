@@ -1,0 +1,121 @@
+package com.n23.expense_sharing_app.service;
+
+
+import com.n23.expense_sharing_app.entity.Expense;
+import com.n23.expense_sharing_app.entity.ExpenseSplit;
+import com.n23.expense_sharing_app.entity.User;
+import com.n23.expense_sharing_app.repository.ExpenseRepository;
+import com.n23.expense_sharing_app.repository.ExpenseSplitRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+@Service
+public class SettlementService {
+
+
+    @Autowired
+    private ExpenseRepository expenseRepository;
+
+    @Autowired
+    private ExpenseSplitRepository expenseSplitRepository;
+
+
+    public Map<Long,Double> getUserBalance(Long groupId)
+    {
+        List<Expense> expenses = expenseRepository.findByGroupIdWithSplits(groupId);
+
+        Map<Long,Double> balance = new HashMap<>();
+
+        for(Expense expense : expenses)
+        {
+            User paidBy = expense.getPaidBy();
+            // 1. Add (+) Total Amount to Payer
+
+//            if(!balance.containsKey(paidBy.getId()))
+//            {
+//                balance.put(paidBy.getId(),expense.getAmount() );
+//            }else{
+//                balance.put(paidBy.getId(), balance.get(paidBy.getId())+expense.getAmount());
+//            }
+
+            balance.merge(paidBy.getId(), expense.getAmount(),(old,curr) ->old+curr);
+
+            List<ExpenseSplit> allSplitExpenses = expenseSplitRepository.findByExpenseId((expense.getId()));
+            for(ExpenseSplit split : allSplitExpenses)
+            {
+                User borrower = split.getUser();
+//                if (!balance.containsKey(gareeb.getId()))
+//                {
+//                    balance.put(gareeb.getId(), -split.getAmount());
+//                }else{
+//                    balance.put(gareeb.getId(), balance.get(gareeb.getId()) - split.getAmount());
+//                }
+
+                balance.merge(borrower.getId(), -split.getAmount(), Double::sum);
+            }
+        }
+        return balance;
+    }
+
+
+
+    public List<String> simplifyDebts(Map<Long,Double>balances)
+    {
+        // 1. Separate into two lists: People who OWE (Negative) and EARN (Positive)
+        // We store them as AbstractMap.SimpleEntry<UserId, Amount>
+        // max Heap
+        PriorityQueue<Map.Entry<Long,Double>> positive = new PriorityQueue<>(
+                (a,b) -> Double.compare(b.getValue(),a.getValue())
+        );
+
+        // min heap
+        PriorityQueue<Map.Entry<Long,Double>> negative = new PriorityQueue<>(
+                (a,b) -> Double.compare(a.getValue(),b.getValue())
+        );
+
+        for(Map.Entry<Long,Double> entry : balances.entrySet())
+        {
+            if(entry.getValue() > 0.01)
+            {
+                positive.add(entry);
+            }else if(entry.getValue() < -0.01){
+                negative.add(entry);
+            }
+        }
+
+
+        List<String> transections = new ArrayList<>();
+
+        // The main Logic
+        while (!positive.isEmpty() && !negative.isEmpty())
+        {
+            Map.Entry<Long,Double> receiver = positive.remove();
+            Map.Entry<Long,Double> payer = negative.remove();
+
+            double settlementAmount = Math.min(Math.abs(payer.getValue()), receiver.getValue());
+
+            transections.add(String.format("User %d pays User %d: ₹%.2f",
+                    payer.getKey(),receiver.getKey(),settlementAmount));
+
+
+            // update remaining balance
+            double payerRemaining = payer.getValue() + settlementAmount; // -50 + 50 = 0
+            double receiverRemaining = receiver.getValue() - settlementAmount; // 100 - 50 = 50
+
+            if(Math.abs(payerRemaining) > 0.01)
+            {
+                payer.setValue(payerRemaining);
+            }
+
+            if(Math.abs(receiverRemaining) > 0.01)
+            {
+                receiver.setValue(receiverRemaining);
+            }
+        }
+            return transections;
+    }
+
+
+}
