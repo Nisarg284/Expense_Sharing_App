@@ -24,7 +24,7 @@ public class SettlementController {
     private SettlementService settlementService;
 //    private GroupService groupService;
 
-//    @GetMapping("/{groupId}")
+    @GetMapping
     public ResponseEntity<Map<String,Object>> getSettlement(@PathVariable Long groupId)
     {
         // Get the raw balance

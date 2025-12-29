@@ -14,6 +14,7 @@ import com.n23.expense_sharing_app.repository.GroupRepository;
 import com.n23.expense_sharing_app.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class ExpenseService {
 
 
     @Transactional
+    @CacheEvict(value = "groupBalances",key = "#requestDTO.groupId")
     public Expense addExpense(ExpenseRequestDTO requestDTO)
     {
         // Validate Group exists

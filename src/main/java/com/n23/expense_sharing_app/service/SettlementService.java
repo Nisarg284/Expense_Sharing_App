@@ -14,6 +14,8 @@ import com.n23.expense_sharing_app.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,6 +35,7 @@ public class SettlementService {
     private UserRepository userRepository;
 
 
+    @Cacheable(value = "groupBalances",key = "#groupId")
     public Map<Long,Double> getUserBalance(Long groupId)
     {
 
@@ -145,6 +148,7 @@ public class SettlementService {
 
     // Settle up
     @Transactional
+    @CacheEvict(value = "groupBalances",key = "#groupId")
     public void settleUp(Long groupId,Long payerId,Long receiverId,Double amount)
     {
         // 1 create the "Expense" Representing the payment
