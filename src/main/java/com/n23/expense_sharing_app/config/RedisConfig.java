@@ -18,6 +18,6 @@ public class RedisConfig {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
                 .disableCachingNullValues();
-//                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer())
+//                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisCacheConfiguration.defaultCacheConfig().entryTtl()));
     }
 }

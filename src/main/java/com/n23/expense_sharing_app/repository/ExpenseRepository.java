@@ -15,9 +15,13 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 //    List<Expense> findByGroupId(Long groupId);
     @Query("SELECT distinct e from Expense e " +
             "LEFT JOIN fetch e.expenseSplits " +
-            "where e.group.id = :groupId"
+            "where e.group.id = :groupId" +
+            " AND e.deleted = false " +
+            " order by e.createdAt DESC"
     )
     List<Expense> findByGroupIdWithSplits(@Param("groupId") Long groupId);
+
+
 
 
 }

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,11 +16,12 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Component
-@AllArgsConstructor
+//@AllArgsConstructor
 public class JwtUtils {
 
 
-    private static final String SECRET_KEY = "nisarg_bhjbcdbffnnkrhdbvvrupdjshikjfdbhka_nf";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 //    private final AuthenticationManager authenticationManager;
 
 

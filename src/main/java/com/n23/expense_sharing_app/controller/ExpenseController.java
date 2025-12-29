@@ -33,6 +33,13 @@ public class ExpenseController {
         return ResponseEntity.ok(groupExpenses);
     }
 
+    @DeleteMapping("/delete/{groupId}/{expenseId}")
+    public ResponseEntity<String> deleteExpense(@PathVariable Long groupId,@PathVariable Long expenseId)
+    {
+        expenseService.deleteExpense(groupId,expenseId);
+        return ResponseEntity.ok("Expense deleted successfully (Balances updated)");
+    }
+
 
 
 }

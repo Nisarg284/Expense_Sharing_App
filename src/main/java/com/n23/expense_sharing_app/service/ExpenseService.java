@@ -1,6 +1,7 @@
 package com.n23.expense_sharing_app.service;
 
 
+import com.n23.expense_sharing_app.dto.ActivityDTO;
 import com.n23.expense_sharing_app.dto.ExpenseRequestDTO;
 import com.n23.expense_sharing_app.entity.Expense;
 import com.n23.expense_sharing_app.entity.ExpenseSplit;
@@ -94,5 +95,52 @@ public class ExpenseService {
     {
         List<Expense> allExpensesOfGroup = expenseRepository.findByGroupIdWithSplits(groupId);
         return allExpensesOfGroup;
+    }
+
+
+
+    public List<ActivityDTO> getGroupActivity(Long groupId)
+    {
+        List<Expense> expenses = expenseRepository.findByGroupIdWithSplits(groupId);
+
+        List<ActivityDTO> activityDTOList = expenses.stream()
+                .map(expense -> {
+                    String message;
+
+                    if (expense.getType() == ExpenseType.SETTLEMENT) {
+                        String receiverName = "Someone";
+                        if (!expense.getExpenseSplits().isEmpty()) {
+                            receiverName = expense.getExpenseSplits().getFirst().getUser().getName();
+                        }
+                        message = String.format("%s paid %s", expense.getPaidBy().getName(), receiverName);
+                    } else {
+                        message = String.format("%s added %s", expense.getPaidBy().getName(), expense.getDescription());
+                    }
+
+                    return new ActivityDTO(
+                            expense.getId(),
+                            message,
+                            expense.getAmount(),
+                            expense.getCreatedAt(),
+                            expense.getType()
+                    );
+                }).toList();
+
+        return activityDTOList;
+    }
+
+    // Delete Expense(soft delete)
+    @Transactional
+    @CacheEvict(value = "groupBalances",key = "#groupId")
+    public void deleteExpense(Long groupId,Long expenseId)
+    {
+        Expense expense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not Found"));
+
+        expense.setDeleted(true); // soft delete
+
+        expenseRepository.save(expense);
+
+
     }
 }
