@@ -6,6 +6,7 @@ import com.n23.expense_sharing_app.entity.Expense;
 import com.n23.expense_sharing_app.entity.ExpenseSplit;
 import com.n23.expense_sharing_app.entity.Group;
 import com.n23.expense_sharing_app.entity.User;
+import com.n23.expense_sharing_app.enums.ExpenseType;
 import com.n23.expense_sharing_app.exception.ResourceNotFoundException;
 import com.n23.expense_sharing_app.repository.ExpenseRepository;
 import com.n23.expense_sharing_app.repository.ExpenseSplitRepository;
@@ -61,6 +62,7 @@ public class ExpenseService {
         expense.setDescription(requestDTO.getDescription());
         expense.setGroup(group);
         expense.setPaidBy(payer);
+        expense.setType(ExpenseType.EXPENSE);
 
         Expense savedExpense = expenseRepository.save(expense);
 

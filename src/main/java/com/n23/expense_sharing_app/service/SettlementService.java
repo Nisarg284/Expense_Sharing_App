@@ -1,13 +1,17 @@
 package com.n23.expense_sharing_app.service;
 
 
+import com.n23.expense_sharing_app.dto.SettlementTransactionDTO;
 import com.n23.expense_sharing_app.entity.Expense;
 import com.n23.expense_sharing_app.entity.ExpenseSplit;
 import com.n23.expense_sharing_app.entity.User;
+import com.n23.expense_sharing_app.enums.ExpenseType;
 import com.n23.expense_sharing_app.exception.ResourceNotFoundException;
 import com.n23.expense_sharing_app.repository.ExpenseRepository;
 import com.n23.expense_sharing_app.repository.ExpenseSplitRepository;
 import com.n23.expense_sharing_app.repository.GroupRepository;
+import com.n23.expense_sharing_app.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,8 @@ public class SettlementService {
 //    @Autowired
     private ExpenseSplitRepository expenseSplitRepository;
     private final GroupRepository groupRepository; // add this field
+
+    private UserRepository userRepository;
 
 
     public Map<Long,Double> getUserBalance(Long groupId)
@@ -53,8 +59,8 @@ public class SettlementService {
 
             balance.merge(paidBy.getId(), expense.getAmount(),(old,curr) ->old+curr);
 
-            List<ExpenseSplit> allSplitExpenses = expenseSplitRepository.findByExpenseId((expense.getId()));
-            for(ExpenseSplit split : allSplitExpenses)
+//            List<ExpenseSplit> allSplitExpenses = expenseSplitRepository.findByExpenseId((expense.getId()));
+            for(ExpenseSplit split : expense.getExpenseSplits())
             {
                 User borrower = split.getUser();
 //                if (!balance.containsKey(gareeb.getId()))
@@ -72,7 +78,7 @@ public class SettlementService {
 
 
 
-    public List<String> simplifyDebts(Map<Long,Double>balances)
+    public List<SettlementTransactionDTO> simplifyDebts(Map<Long,Double>balances)
     {
         // 1. Separate into two lists: People who OWE (Negative) and EARN (Positive)
         // We store them as AbstractMap.SimpleEntry<UserId, Amount>
@@ -97,7 +103,7 @@ public class SettlementService {
         }
 
 
-        List<String> transections = new ArrayList<>();
+        List<SettlementTransactionDTO> transections = new ArrayList<>();
 
         // The main Logic
         while (!positive.isEmpty() && !negative.isEmpty())
@@ -107,8 +113,13 @@ public class SettlementService {
 
             double settlementAmount = Math.min(Math.abs(payer.getValue()), receiver.getValue());
 
-            transections.add(String.format("User %d pays User %d: ₹%.2f",
-                    payer.getKey(),receiver.getKey(),settlementAmount));
+            transections.add(
+                    new SettlementTransactionDTO(
+                            payer.getKey(),
+                            receiver.getKey(),
+                            settlementAmount
+                    )
+            );
 
 
             // update remaining balance
@@ -128,6 +139,35 @@ public class SettlementService {
             }
         }
             return transections;
+    }
+
+
+
+    // Settle up
+    @Transactional
+    public void settleUp(Long groupId,Long payerId,Long receiverId,Double amount)
+    {
+        // 1 create the "Expense" Representing the payment
+        Expense settlement = new Expense();
+        settlement.setDescription("Settlement Payment");
+        settlement.setAmount(amount);
+        settlement.setGroup(groupRepository.getReferenceById(groupId));
+        settlement.setPaidBy(userRepository.getReferenceById(payerId)); // // The person GIVING money
+        settlement.setType(ExpenseType.SETTLEMENT);
+
+        Expense savedSettlement = expenseRepository.save(settlement);
+
+
+        // 2. Create the split logic
+        // The Receiver is treated as the one "Consuming" the money for accounting purposes
+
+        ExpenseSplit split = new ExpenseSplit();
+        split.setExpense(savedSettlement);
+        split.setUser(userRepository.getReferenceById(receiverId));
+        split.setAmount(amount);
+
+        expenseSplitRepository.save(split);
+
     }
 
 

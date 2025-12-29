@@ -18,4 +18,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             "where e.group.id = :groupId"
     )
     List<Expense> findByGroupIdWithSplits(@Param("groupId") Long groupId);
+
+
 }

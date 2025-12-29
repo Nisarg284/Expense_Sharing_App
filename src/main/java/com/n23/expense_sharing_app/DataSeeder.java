@@ -30,8 +30,8 @@
 //    public void run(String... args) throws Exception {
 //        // 1. Create Users with HASHED passwords
 //        User user1 = new User();
-//        user1.setName("Alice");
-//        user1.setEmail("alice@test.com");
+//        user1.setName("Nisarg");
+//        user1.setEmail("Nisarg23@gmail.com");
 //        user1.setPassword(passwordEncoder.encode("password123")); // <--- Hashing happening here
 //
 //        User user2 = new User();

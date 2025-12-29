@@ -2,6 +2,7 @@ package com.n23.expense_sharing_app.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.n23.expense_sharing_app.enums.ExpenseType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,9 +44,13 @@ public class Expense {
     private Group group;
 
     @OneToMany(mappedBy = "expense", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
+//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Optional but safe
     private List<ExpenseSplit> expenseSplits;
 
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "expense_type")
+    private ExpenseType type;
 
 
 }
